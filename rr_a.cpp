@@ -20,6 +20,7 @@
 
 #if defined(__MACH__) || defined(__FreeBSD__)
 #include <arpa/nameser.h>
+#else
 #include <nameser.h>
 #endif
 
