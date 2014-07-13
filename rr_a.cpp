@@ -12,6 +12,7 @@
 #include <sys/time.h>
 #include <sys/socket.h>
 
+#include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
 #include <netinet/tcp.h>
@@ -19,6 +20,7 @@
 
 #ifdef __linux__
 #include <arpa/nameser.h>
+#elif __FreeBSD__
 #else
 #include <nameser.h>
 #endif
