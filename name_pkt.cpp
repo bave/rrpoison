@@ -1,7 +1,7 @@
 #include <stdlib.h>
-#include <resolv.h>
 #include <time.h>
 
+#include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/types.h>
 #include <sys/time.h>
@@ -12,6 +12,7 @@
 #include <nameser.h>
 #endif
 
+#include <resolv.h>
 
 #include "name_pkt.hpp"
 
