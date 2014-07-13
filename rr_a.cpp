@@ -18,10 +18,8 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-#ifdef __linux__
+#if defined(__MACH__) || defined(__FreeBSD__)
 #include <arpa/nameser.h>
-#elif __FreeBSD__
-#else
 #include <nameser.h>
 #endif
 

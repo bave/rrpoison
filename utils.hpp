@@ -34,7 +34,7 @@ bool debug = true;
 #define PERROR(func) do {} while (false)
 #endif //DEBUG
 
-#ifdef __MACH__
+#if defined(__MACH__) || defined(__FreeBSD__)
 struct icmphdr {
     uint8_t  icmp_type;
     uint8_t  icmp_code;

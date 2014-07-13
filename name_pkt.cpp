@@ -6,7 +6,7 @@
 #include <sys/types.h>
 #include <sys/time.h>
 
-#ifdef __linux__
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <arpa/nameser.h>
 #else
 #include <nameser.h>
