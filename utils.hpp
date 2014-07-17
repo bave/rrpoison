@@ -34,14 +34,6 @@ bool debug = true;
 #define PERROR(func) do {} while (false)
 #endif //DEBUG
 
-#if defined(__MACH__) || defined(__FreeBSD__)
-struct icmphdr {
-    uint8_t  icmp_type;
-    uint8_t  icmp_code;
-    uint16_t icmp_cksum;
-};
-#endif
-
 bool is_ipv4_address(const std::string &addr)
 {
     struct sockaddr_in sin;
@@ -50,6 +42,46 @@ bool is_ipv4_address(const std::string &addr)
     } else {
         return false;
     }
+}
+
+
+
+void memdump(void* mem, int i)
+{
+    if(i >= 2000)
+    {
+        printf("allocation memory size over\n");
+        return;
+    }
+
+    int j;
+    int max;
+    int *memi;
+    int *buf;
+    buf = (int*)malloc(2000);
+    memset(buf, 0, 2000);
+    memcpy(buf, mem, i);
+    memi = buf;
+
+    printf("start memory dump %p ***** (16byte alignment)\n", mem);
+    max = i / 16 + (i % 16 ? 1 : 0);
+
+    for (j = 0; j < max; j++)
+    {
+        printf("%p : %08x %08x %08x %08x\n",
+                memi,
+                htonl(*(memi)),
+                htonl(*(memi+1)),
+                htonl(*(memi+2)),
+                htonl(*(memi+3))
+              );
+        memi += 4;
+    }
+
+    printf("end memory dump *****\n");
+    free(buf);
+
+    return;
 }
 
 #endif //__UTILS_HPP__

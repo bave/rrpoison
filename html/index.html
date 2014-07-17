@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>DNSのフラグビット</title>
+    </head>
+
+<body>
+    <img src="./dns_header.png"/><br/>
+    <h2>flag field</h2>
+    <table border="1">
+    <tr>
+        <th>ビット数</th><th colspan="2">名前</th><th>意味</th>
+    </tr>
+    <tr>
+        <td>1</td><td>問い合わせ/応答</td><td>QR</td><td class="left">0…問い合わせ<br>1…応答</td>
+    </tr>
+    <tr>
+        <td>4</td><td>オペレーションコード</td><td>OPcode</td><td class="left">0…問い合わせ<br>1…逆問い合わせ<br>2…サーバ状態要求</td>
+    </tr>
+    <tr>
+        <td>1</td><td>オーソリティ応答</td><td>AA</td><td class="left">0…反復の結果の応答<br>1…ネームサーバからの応答</td>
+    </tr>
+    <tr>
+        <td>1</td><td>切捨て</td><td>TC</td><td>0…データサイズ512バイト以下<br>1…512バイト超</td></tr>
+    <tr>
+        <td>1</td><td>再帰要望</td><td>RD</td><td>0…反復問い合わせ<br>1…再帰問い合わせをネームサーバに要求</td>
+    </tr>
+    <tr>
+        <td>1</td><td>再帰有効</td><td>RA</td><td>0…再帰不可能<br>1…再帰可能</td>
+    </tr>
+    <tr>
+        <td>1</td><td>予約</td><td>Z</td><td>0</td>
+    </tr>
+    <tr>
+        <td>1</td><td>Authentication data</td><td>AD</td>
+        <td>DNSSEC<br/>0:認証されたデータではない<br/>1:認証されたデータである<br/>DNSSECでvalidであればサーバ側でアサートするフラグ</td>
+    </tr>
+    <tr>
+        <td>1</td><td>Checking Disabled</td><td>CD</td>
+        <td>DNSSEC<br/>0:DNSSECのvalidationを実施する<br/>1:DNSSECのvalidationwoを実施しない<br/>クライアント側で支持するフラグ</td>
+    </tr>
+    <tr>
+        <td>4</td><td>戻りコード</td><td>Rcode</td>
+        <td> 0…応答成功 <br> 1…フォーマットエラー <br> 2…サーバエラー <br> 3…問い合わせの名前なし <br> 4…未実装 <br> 5…拒否 </td>
+    </tr>
+    </table>
+
+    <h2>Flag bit of dnssec, AD/CD</h2>
+    FLAGビットに関する振る舞いの詳細についてはRFC4035 section-3.1.6, 3.2.2, 3.2.3, 4, 4.9参照
+    </pre>
+
+    <h2>Wireshark answer flag sample</h2>
+    <img border="1" src="./dns_flag_wireshark_sample.png"/>
+
+</body>
