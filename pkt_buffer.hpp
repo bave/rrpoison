@@ -9,7 +9,7 @@
 #include <netinet/ip_icmp.h>
 #include <arpa/inet.h>
 
-#if defined(__MACH__) || defined(__FreeBSD__)
+#if defined(__MACH__)
 struct icmphdr {
     uint8_t  icmp_type;
     uint8_t  icmp_code;
