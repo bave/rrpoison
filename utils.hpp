@@ -45,7 +45,8 @@ bool is_ipv4_address(const std::string &addr)
 }
 
 
-
+/*
+// XXX broken...
 void memdump(void* mem, int i)
 {
     if(i >= 2000)
@@ -78,11 +79,50 @@ void memdump(void* mem, int i)
         memi += 4;
     }
 
-    printf("end memory dump *****\n");
+    printf("end memory dump ***** %d byte\n", i);
     free(buf);
 
     return;
 }
+*/
+
+void memdump(void* buffer, int length)
+{
+    uint32_t* addr32 = (uint32_t*)buffer;
+    int i;
+    int j;
+    int k;
+    int lines = length/16 + (length%16?1:0);
+    for (i=0; i<lines; i++) {
+        printf("%p : %08x %08x %08x %08x\n",
+                addr32,
+                htonl(*(addr32)),
+                htonl(*(addr32+1)),
+                htonl(*(addr32+2)),
+                htonl(*(addr32+3))
+              );
+        addr32 += 4;
+    }
+
+    j = length%16;
+    if (j == 0) return;
+    k = 0;
+    uint8_t*  addr8 = (uint8_t*)addr32;
+    printf("%p : ", addr8);
+    for (i=0; i<16; i++) {
+        if (k%4 == 0 && i != 0) printf(" ");
+        if (j > i) {
+            printf("%02x", *addr8);
+            addr8++;
+        } else {
+            printf("XX");
+        }
+        k++;
+    }
+    printf("\n");
+    return;
+}
+
 
 #endif //__UTILS_HPP__
 

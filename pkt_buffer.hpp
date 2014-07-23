@@ -9,6 +9,9 @@
 #include <netinet/ip_icmp.h>
 #include <arpa/inet.h>
 
+//XXX
+#include "utils.hpp"
+
 #if defined(__MACH__)
 struct icmphdr {
     uint8_t  icmp_type;
@@ -19,10 +22,8 @@ struct icmphdr {
 
 class pkt_buffer {
 public:
-    pkt_buffer() {
-        init();
-    };
-    virtual ~pkt_buffer() {};
+    pkt_buffer() { init(); };
+    virtual ~pkt_buffer() { };
 
     bool set_buffer(char* buf, int buf_size);
     char* get_buffer();
@@ -36,9 +37,7 @@ public:
     struct sockaddr_in get_dst_sockaddr();
 
 
-private:
-    void init();
-
+protected:
     char* buffer;
     struct ip* iphdr;
     struct udphdr* udphdr;
@@ -46,6 +45,9 @@ private:
     int iphdr_size;
     int udphdr_size;
     int payload_size;
+
+private:
+    void init();
     uint16_t checksum(const uint8_t* buf, size_t size, uint32_t adjust);
     void checksum_ip(struct ip* iphdr);
     void checksum_transport(struct ip* iphdr, size_t size);
@@ -134,6 +136,14 @@ pkt_buffer::set_iphdr(std::string& src, std::string& dst)
 
 }
 
+/*
+ * 0                16               31
+ * +--------+--------+--------+--------+
+ * |     src port    |     dst port    |
+ * +--------+--------+--------+--------+
+ * |  udp length     |   check sum     |
+ * +--------+--------+--------+--------+
+ */
 bool
 pkt_buffer::set_udphdr(int sport, int dport)
 {
@@ -176,7 +186,7 @@ pkt_buffer::post_processing()
     struct udphdr* udphdr = (struct udphdr*)(buffer + iphdr_size);
 
     iphdr->ip_len = iphdr_size + udphdr_size + payload_size;
-    udphdr->uh_ulen = udphdr_size + payload_size;
+    udphdr->uh_ulen = htons(udphdr_size + payload_size);
 
     checksum_transport(iphdr, iphdr->ip_len);
 

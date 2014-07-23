@@ -144,6 +144,8 @@ main(int argc, char** argv)
     np->n_create_rr_answer(opt_a);
     np->n_build_payload();
 
+    memdump((void*)np->n_payload(), np->n_payload_size());
+
     pb->set_payload(np->n_payload(), np->n_payload_size());
     pb->post_processing();
 

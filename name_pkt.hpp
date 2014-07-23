@@ -212,7 +212,7 @@ bool n_create_rr_answer(string &s);
 // you can use out of class function
 size_t n_compress(const char *src, size_t src_size, char *dst, size_t dst_size);
 
-private:
+protected:
 
 // class member (for class information)
 u_char *count_pointer;
@@ -320,7 +320,6 @@ void name_pkt::n_init(void) {
 
     return;
 };
-
 
 void name_pkt::n_set_id(int i)
 {
