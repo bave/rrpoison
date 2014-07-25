@@ -1,6 +1,8 @@
 RRPOISON
 ========
- * DNS Resource Recode Poisoning Software
+ * DNS Resource Recode Poisoning Software.
+ * RR-type is A only
+ * the Other type is in production.
 
 ```
 # cd rrpoison
@@ -20,18 +22,18 @@ OPTION
 -x [target port]   : 0 is random (default:0)
 -y [target dns_is] : 0 is random (default:0)
 
-If you want to spoof the source address, you set a same option (-s) alias address to the sending IF.
-Example: ifconfig lo0 alias x.x.x.x.
+If you want to spoof the source address,
+you set a same option (-s) alias address to the sending network IF.
+Example: sudo ifconfig lo0 alias x.x.x.x/32
 
 ```
 
-* Depend
+### Depend
  - MacOSX  o
  - FreeBSD o
  - Linux   x
 
 ## Contributing
-
 1. Fork it
 2. Create your feature branch (`git checkout -b new-branch-name`)
 3. Commit your changes (`git commit -am 'Add comment at some your new features'`)
