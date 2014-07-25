@@ -5,6 +5,7 @@ RRPOISON
  * the Other type is in production.
 
 ```
+# git clone https://github.com/bave/rrpoison.git
 # cd rrpoison
 # cmake .
 # make
