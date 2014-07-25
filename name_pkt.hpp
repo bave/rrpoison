@@ -342,6 +342,10 @@ void name_pkt::n_reset_flags(void)
 
 bool name_pkt::n_create_rr_questionA(string &s)
 {
+    // XXX
+    //なんかバグがある予感．．
+    //なかに入れる文字列に酔ってtype/classの値がおかしくなる？
+
     // DNS HEADER PART
 
     // DNS Question Record

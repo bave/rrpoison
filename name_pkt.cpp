@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+#include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/select.h>
 #include <sys/types.h>
@@ -24,7 +25,7 @@ int get_resolver_count(void);
 
 int main(int argc, char** argv)
 {
-    if (!(argc == 3 || argc == 2)) usage(argv[0]);
+    if (!(argc == 3 || argc == 4)) usage(argv[0]);
 
     srand((unsigned)time(NULL));
     uint16_t ns_id = (rand()&0x0000FFFF);
@@ -64,6 +65,20 @@ int main(int argc, char** argv)
         inet_pton(AF_INET, argv[2], &sin1.sin_addr);
     }
 
+    printf("%s\n", argv[3]);
+    int a;
+    if (argc == 4) {
+        inet_pton(AF_INET, argv[2], &sin1.sin_addr);
+        sin2.sin_family = AF_INET;
+        sin2.sin_port = htons(atoi(argv[3]));
+        inet_pton(AF_INET, argv[2], &sin2.sin_addr);
+        if (::bind(sockfd, (struct sockaddr*)&sin2, sizeof(sin2)) < 0) {
+            perror("bind");
+            exit(1);
+        }
+        //printf("%d\n", err);
+    }
+
     /*
     struct timeval {
         time_t       tv_sec;
@@ -75,10 +90,13 @@ int main(int argc, char** argv)
     struct timeval current;
 
     int s_retval;
-    struct timeval t_val;
     fd_set s_fd;
+
+    /*
+    struct timeval t_val;
     memset(&t_val, 0, sizeof(t_val));
     t_val.tv_sec = 2;
+    */
 
     gettimeofday(&prev, NULL);
     sendto(sockfd, npkt.n_payload(), npkt.n_payload_size(), 0, (SA*)&sin1, sizeof(sin1));
@@ -86,7 +104,8 @@ int main(int argc, char** argv)
     re:
     FD_ZERO(&s_fd);
     FD_SET(sockfd, &s_fd);
-    s_retval = select((sockfd+1), &s_fd, NULL, NULL, &t_val);
+    //s_retval = select((sockfd+1), &s_fd, NULL, NULL, &t_val);
+    s_retval = select((sockfd+1), &s_fd, NULL, NULL, NULL);
     if (s_retval <= 0) {
         if (s_retval == -1) {
             perror("select");
@@ -206,9 +225,8 @@ int main(int argc, char** argv)
 
 void usage(char* filename){
     printf("%s [hostname]\n", filename);
-    printf("  -- find /etc/resolv.conf nameserver.\n");
     printf("%s [hostname] [dns server]\n", filename);
-    printf("  -- use option's dns server.\n");
+    printf("%s [hostname] [dns server] [source port]\n", filename);
     exit(-1);
 }
 
