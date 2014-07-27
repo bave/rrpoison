@@ -256,11 +256,17 @@ main(int argc, char** argv)
 
 void usage(char* prog_name)
 {
-    printf("%s -s [source address] -d [destination address] -a [ans address] -r [req name]\n", prog_name);
+    printf("%s\n", prog_name);
+    printf("	Must..");
+    printf("	-s [source address]\n");
+    printf("	-d [destination address]\n");
+    printf("	-a [ans address] \n");
+    printf("	-r [req name]\n");
     printf("	Option..");
     printf("	-c [count number]  : 0 is loop   (default:0)\n");
     printf("	-x [target port]   : 0 is random (default:0)\n");
     printf("	-y [target dns_is] : 0 is random (default:0)\n");
+    printf("	-v : verbose mode (default:disable)\n");
     printf("\n");
     printf("If you want to spoof the source address,\n");
     printf("you set a same option (-s) alias address to the sending IF.\n");
