@@ -166,6 +166,8 @@ int main(int argc, char** argv)
     if (count == 0) {
 #ifdef __linux__
         printf("%lu.%06li %s nxdomain\n", sec, usec, argv[1]);
+#elif __FreeBSD__
+        printf("%lu.%06ld %s nxdomain\n", sec, usec, argv[1]);
 #else
         printf("%lu.%06d %s nxdomain\n", sec, usec, argv[1]);
 #endif
@@ -174,6 +176,8 @@ int main(int argc, char** argv)
     } else {
 #ifdef __linux__
         printf("%lu.%06li ", sec, usec);
+#elif __FreeBSD__
+        printf("%lu.%06ld ", sec, usec);
 #else
         printf("%lu.%06d ", sec, usec);
 #endif
