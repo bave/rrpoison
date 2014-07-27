@@ -20,7 +20,7 @@
 #include <netinet/tcp.h>
 #include <arpa/inet.h>
 
-#if defined(__MACH__) || defined(__FreeBSD__)
+#if defined(__linux__) || defined(__FreeBSD__)
 #include <arpa/nameser.h>
 #else
 #include <nameser.h>

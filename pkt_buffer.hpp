@@ -2,6 +2,7 @@
 #define __PKT_BUFFER_HPP__
 
 
+// system include
 #include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
@@ -9,8 +10,9 @@
 #include <netinet/ip_icmp.h>
 #include <arpa/inet.h>
 
-//XXX
+// user include
 #include "utils.hpp"
+
 
 #if defined(__MACH__)
 struct icmphdr {
@@ -105,15 +107,6 @@ pkt_buffer::set_iphdr(std::string& src, std::string& dst)
         return false;
     }
 
-    // set raw ip header and raw udp header
-#ifdef __linux__
-
-   //struct iphdr ip_header;
-   //struct tcphdr tcp_header;
-   return false;
-
-#else //defined(__FreeBSD__) || defined(__MACH__)
-
     iphdr = (struct ip*)buffer;
 
     // ip header
@@ -131,9 +124,6 @@ pkt_buffer::set_iphdr(std::string& src, std::string& dst)
 
     iphdr_size = sizeof(struct ip);
     return true;
-
-#endif
-
 }
 
 /*
@@ -153,11 +143,18 @@ pkt_buffer::set_udphdr(int sport, int dport)
 
     udphdr = (struct udphdr*)(buffer + iphdr_size);
 
+#ifdef __linux__
+    udphdr->source = htons(sport);
+    udphdr->dest   = htons(dport);
+    udphdr->len    = 0;
+    udphdr->check  = 0;
+#else
     // udp header
     udphdr->uh_sport = htons(sport);
     udphdr->uh_dport = htons(dport);
     udphdr->uh_ulen  = 0;
     udphdr->uh_sum   = 0;
+#endif
 
     udphdr_size = sizeof(struct udphdr);
     return true;
@@ -186,7 +183,11 @@ pkt_buffer::post_processing()
     struct udphdr* udphdr = (struct udphdr*)(buffer + iphdr_size);
 
     iphdr->ip_len = iphdr_size + udphdr_size + payload_size;
+#ifdef __linux__
+    udphdr->len = htons(udphdr_size + payload_size);
+#else
     udphdr->uh_ulen = htons(udphdr_size + payload_size);
+#endif
 
     checksum_transport(iphdr, iphdr->ip_len);
 
@@ -271,17 +272,32 @@ pkt_buffer::checksum_transport(struct ip* iphdr, size_t size)
     if (protocol == IPPROTO_TCP) {
         //pseudoSum += (uint8_t)IPPROTO_TCP;
         struct tcphdr* tcphdr = (struct tcphdr*)l4_buf;
+#ifdef __linux__
+        tcphdr->check = 0x0000;
+        tcphdr->check = htons(checksum(l4_buf, segment_size, pseudoSum));
+#else
         tcphdr->th_sum = 0x0000;
         tcphdr->th_sum = htons(checksum(l4_buf, segment_size, pseudoSum));
+#endif
     } else if (protocol == IPPROTO_UDP) {
         //pseudoSum += (uint8_t)IPPROTO_UDP;
         struct udphdr* udphdr = (struct udphdr*)l4_buf;
+#ifdef __linux__
+        udphdr->check = 0x0000;
+        udphdr->check = htons(checksum(l4_buf, segment_size, pseudoSum));
+#else
         udphdr->uh_sum = 0x0000;
         udphdr->uh_sum = htons(checksum(l4_buf, segment_size, pseudoSum));
+#endif
     } else if (protocol == IPPROTO_ICMP) {
         struct icmphdr* icmphdr = (struct icmphdr*)l4_buf;
+#ifdef __linux__
+        icmphdr->checksum = 0x0000;
+        icmphdr->checksum = htons(checksum((uint8_t*)icmphdr, segment_size, 0));
+#else
         icmphdr->icmp_cksum = 0x0000;
         icmphdr->icmp_cksum = htons(checksum((uint8_t*)icmphdr, segment_size, 0));
+#endif
     } else {
         ;
     }
@@ -308,12 +324,16 @@ pkt_buffer::get_src_sockaddr()
         return hoge;
     }
 
-#ifndef __linux__
+#ifdef __linux__
+    hoge.sin_family = AF_INET;
+    hoge.sin_addr.s_addr = iphdr->ip_src.s_addr;
+    hoge.sin_port = udphdr->source;
+#else
     hoge.sin_len = sizeof(hoge);
-#endif
     hoge.sin_family = AF_INET;
     hoge.sin_addr.s_addr = iphdr->ip_src.s_addr;
     hoge.sin_port = udphdr->uh_sport;
+#endif
     return hoge;
 }
 
@@ -327,12 +347,16 @@ pkt_buffer::get_dst_sockaddr()
         return hoge;
     }
 
-#ifndef __linux__
+#ifdef __linux__
+    hoge.sin_family = AF_INET;
+    hoge.sin_addr.s_addr = iphdr->ip_dst.s_addr;
+    hoge.sin_port = udphdr->dest;
+#else
     hoge.sin_len = sizeof(hoge);
-#endif
     hoge.sin_family = AF_INET;
     hoge.sin_addr.s_addr = iphdr->ip_dst.s_addr;
     hoge.sin_port = udphdr->uh_dport;
+#endif
     return hoge;
 }
 

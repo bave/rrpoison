@@ -44,7 +44,11 @@ name_buffer::change_dport_dnsid(uint16_t port, uint16_t id)
         return false;
     }
 
+#ifdef __linux__
+    udphdr->dest = htons(port);
+#else
     udphdr->uh_dport = htons(port);
+#endif
 
     uint16_t* dns_id = (uint16_t*)(buffer + iphdr_size + udphdr_size);
     *dns_id = htons(id);
