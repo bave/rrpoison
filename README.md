@@ -32,7 +32,8 @@ Example: sudo ifconfig lo0 alias x.x.x.x/32
 ### Depend
  - MacOSX  o
  - FreeBSD o
- - Linux   x
+ - Linux   o
+ - etc     ?
 
 ## Contributing
 1. Fork it
