@@ -25,7 +25,7 @@ int get_resolver_count(void);
 
 int main(int argc, char** argv)
 {
-    if (!(argc == 3 || argc == 4)) usage(argv[0]);
+    if (!(argc == 2 || argc == 3 || argc == 4)) usage(argv[0]);
 
     srand((unsigned)time(NULL));
     uint16_t ns_id = (rand()&0x0000FFFF);
@@ -60,23 +60,20 @@ int main(int argc, char** argv)
     if (argc == 2) {
         inet_pton(AF_INET, get_resolver(0), &sin1.sin_addr);
         //printf("%s\n", get_resolver(0));
-    }
-    if (argc == 3) {
+    } else if (argc == 3) {
         inet_pton(AF_INET, argv[2], &sin1.sin_addr);
-    }
-
-    printf("%s\n", argv[3]);
-    int a;
-    if (argc == 4) {
+    } else if (argc == 4) {
         inet_pton(AF_INET, argv[2], &sin1.sin_addr);
+        sin2.sin_len = sizeof(struct sockaddr_in);
         sin2.sin_family = AF_INET;
         sin2.sin_port = htons(atoi(argv[3]));
-        inet_pton(AF_INET, argv[2], &sin2.sin_addr);
+        //inet_pton(AF_INET, argv[2], &sin2.sin_addr);
         if (bind(sockfd, (struct sockaddr*)&sin2, sizeof(sin2)) < 0) {
             perror("bind");
             exit(1);
         }
         //printf("%d\n", err);
+    } else {
     }
 
     /*
