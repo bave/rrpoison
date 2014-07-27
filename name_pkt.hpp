@@ -129,7 +129,7 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+//using namespace std;
 
 class name_pkt {
 #define DNS_MAX_LEN_SIZE 64
@@ -203,11 +203,11 @@ void n_set_flags(uint16_t i);
 void n_build_payload(void);
 void n_build_tcp_payload(void);
 
-bool n_create_rr_questionA(string &s);
-bool n_create_rr_questionAAAA(string &s);
-bool n_create_rr_answer(string &s);
-//bool n_create_rr_nameserver(string &s);
-//bool n_create_rr_additional(string &s);
+bool n_create_rr_questionA(std::string &s);
+bool n_create_rr_questionAAAA(std::string &s);
+bool n_create_rr_answer(std::string &s);
+//bool n_create_rr_nameserver(std::string &s);
+//bool n_create_rr_additional(std::string &s);
 
 // you can use out of class function
 size_t n_compress(const char *src, size_t src_size, char *dst, size_t dst_size);
@@ -330,7 +330,7 @@ void name_pkt::n_set_id(int i)
 void name_pkt::n_set_flags(uint16_t i)
 {
     n_flags = (n_flags | i); 
-    //cout << hex << n_flags << endl;
+    //std::cout << hex << n_flags << std::endl;
     return;
 };
 
@@ -340,7 +340,7 @@ void name_pkt::n_reset_flags(void)
     return;
 };
 
-bool name_pkt::n_create_rr_questionA(string &s)
+bool name_pkt::n_create_rr_questionA(std::string &s)
 {
     // XXX
     //なんかバグがある予感．．
@@ -356,7 +356,7 @@ bool name_pkt::n_create_rr_questionA(string &s)
     return true;
 };
 
-bool name_pkt::n_create_rr_questionAAAA(string &s)
+bool name_pkt::n_create_rr_questionAAAA(std::string &s)
 {
     // DNS HEADER PART
 
@@ -368,7 +368,7 @@ bool name_pkt::n_create_rr_questionAAAA(string &s)
     return true;
 };
 
-bool name_pkt::n_create_rr_answer(string &s)
+bool name_pkt::n_create_rr_answer(std::string &s)
 {
     n_ans++;
     //npkt.n_ans_name[0] = 0xC0;
@@ -384,7 +384,7 @@ bool name_pkt::n_create_rr_answer(string &s)
     n_ans_ttl = 10000;
     if ( n_ans_type == 1) {
         // input IPv4 address
-        //cout << "rr_answer ipv4" << endl;
+        //std::cout << "rr_answer ipv4" << std::endl;
         n_ans_rlen = 4;
         inet_pton(AF_INET, s.data(), &n_ans_raddr);
     } else if ( n_ans_type == 28) {
@@ -400,12 +400,12 @@ bool name_pkt::n_create_rr_answer(string &s)
 };
 
 /*
-bool name_pkt::n_create_rr_nameserver(string &s)
+bool name_pkt::n_create_rr_nameserver(std::string &s)
 //n_name++;
 return false;
 };
 
-bool name_pkt::n_create_rr_additional(string &s)
+bool name_pkt::n_create_rr_additional(std::string &s)
 //n_add++;
 return false;
 };
@@ -691,10 +691,10 @@ size_t name_pkt::n_compress(const char *src, size_t src_size, char *dst, size_t 
 
     if (src_size == 0) return 0;
 
-    string::size_type i;
-    string::size_type j;
-    vector<string> v;
-    string s(src,src_size);
+    std::string::size_type i;
+    std::string::size_type j;
+    std::vector<std::string> v;
+    std::string s(src,src_size);
 
     while (s[s.size()-1] == '\0') {
         s = s.substr(0,s.size()-1);
@@ -705,18 +705,18 @@ size_t name_pkt::n_compress(const char *src, size_t src_size, char *dst, size_t 
     i = 0;
     j = s.find(".");
 
-    while(j != string::npos){
+    while(j != std::string::npos){
         if (i == 0) v.push_back(s.substr(i,j-i));
         if (i != 0) v.push_back(s.substr(i+1,j-i-1));
         i = j++;
         j = s.find(".", j);
-        if (j == string::npos){
+        if (j == std::string::npos){
             v.push_back(s.substr(i+1, s.size()));
             break;
         }
     }
 
-    string compress_s;
+    std::string compress_s;
     for (unsigned int i=0; i< v.size(); i++) {
         compress_s += (char)v[i].size();
         compress_s += v[i];

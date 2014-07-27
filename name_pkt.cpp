@@ -72,7 +72,7 @@ int main(int argc, char** argv)
         sin2.sin_family = AF_INET;
         sin2.sin_port = htons(atoi(argv[3]));
         inet_pton(AF_INET, argv[2], &sin2.sin_addr);
-        if (::bind(sockfd, (struct sockaddr*)&sin2, sizeof(sin2)) < 0) {
+        if (bind(sockfd, (struct sockaddr*)&sin2, sizeof(sin2)) < 0) {
             perror("bind");
             exit(1);
         }
