@@ -257,7 +257,7 @@ main(int argc, char** argv)
 void usage(char* prog_name)
 {
     printf("%s\n", prog_name);
-    printf("	Must..");
+    printf("	Must..\n");
     printf("	-s [source address]\n");
     printf("	-d [destination address]\n");
     printf("	-a [ans address] \n");
