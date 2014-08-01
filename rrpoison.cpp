@@ -33,6 +33,8 @@
 #define SA struct sockaddr
 #define SAIN struct sockaddr_in
 
+uint16_t assign_port();
+uint16_t assign_dns_id();
 void usage(char* prog_name);
 void interval(struct timeval i);
 //int   get_resolver_count(void);
@@ -182,12 +184,12 @@ main(int argc, char** argv)
     if (target_port != 0) {
         nb->set_udphdr(53, target_port);
     } else {
-        nb->set_udphdr(53, (uint16_t)rand());
+        nb->set_udphdr(53, assign_port());
     }
     if (target_id != 0) {
         nb->set_payload_dns(target_id, QR|AA|RD|RA, opt_r, opt_a);
     } else {
-        nb->set_payload_dns((uint16_t)rand(), QR|AA|RD|RA, opt_r, opt_a);
+        nb->set_payload_dns(assign_dns_id(), QR|AA|RD|RA, opt_r, opt_a);
     }
     nb->post_processing();
 
@@ -226,11 +228,11 @@ main(int argc, char** argv)
         if (target_port != 0 && target_id != 0) {
             nb->change_dport_dnsid(target_port, target_id);
         } else if (target_port != 0) {
-            nb->change_dport_dnsid(target_port, (uint16_t)rand());
+            nb->change_dport_dnsid(target_port, assign_dns_id());
         } else if (target_id != 0) {
-            nb->change_dport_dnsid((uint16_t)rand(), target_id);
+            nb->change_dport_dnsid(assign_port(), target_id);
         } else {
-            nb->change_dport_dnsid((uint16_t)rand(), (uint16_t)rand());
+            nb->change_dport_dnsid(assign_port(), assign_dns_id());
         }
         nb->post_processing();
 
@@ -272,6 +274,16 @@ void usage(char* prog_name)
     printf("you set a same option (-s) alias address to the sending IF.\n");
     printf("(Example: ifconfig lo0 alias x.x.x.x/32)\n");
     return;
+}
+
+uint16_t assign_port()
+{
+    return rand();
+}
+
+uint16_t assign_dns_id()
+{
+    return rand();
 }
 
 void interval(struct timeval i)

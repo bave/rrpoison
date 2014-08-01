@@ -64,6 +64,10 @@ int main(int argc, char** argv)
         inet_pton(AF_INET, argv[2], &sin1.sin_addr);
     } else if (argc == 4) {
         inet_pton(AF_INET, argv[2], &sin1.sin_addr);
+#ifdef __linux__
+        sin2.sin_family = AF_INET;
+        sin2.sin_port = htons(atoi(argv[3]));
+#endif
         sin2.sin_len = sizeof(struct sockaddr_in);
         sin2.sin_family = AF_INET;
         sin2.sin_port = htons(atoi(argv[3]));
@@ -98,7 +102,9 @@ int main(int argc, char** argv)
     gettimeofday(&prev, NULL);
     sendto(sockfd, npkt.n_payload(), npkt.n_payload_size(), 0, (SA*)&sin1, sizeof(sin1));
 
+    int hit = 0;
     re:
+
     FD_ZERO(&s_fd);
     FD_SET(sockfd, &s_fd);
     //s_retval = select((sockfd+1), &s_fd, NULL, NULL, &t_val);
@@ -118,6 +124,7 @@ int main(int argc, char** argv)
 
     len = recvfrom(sockfd, buf, BUFSIZ, 0, (SA*)&sin2, &sin_size); 
     gettimeofday(&current, NULL);
+
 
     time_t sec;
     suseconds_t usec;
@@ -150,7 +157,9 @@ int main(int argc, char** argv)
     memset(&ns_handle, 0, sizeof(ns_handle));
     ns_initparse((const unsigned char*)buf,  len, &ns_handle);
     name_id = ns_msg_id(ns_handle);
+    printf("port hit!! %d:%d\n", hit, name_id);
     if (name_id != ns_id) {
+        hit++;
         goto re;
     }
 
