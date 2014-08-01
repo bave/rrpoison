@@ -67,10 +67,11 @@ int main(int argc, char** argv)
 #ifdef __linux__
         sin2.sin_family = AF_INET;
         sin2.sin_port = htons(atoi(argv[3]));
-#endif
+#else
         sin2.sin_len = sizeof(struct sockaddr_in);
         sin2.sin_family = AF_INET;
         sin2.sin_port = htons(atoi(argv[3]));
+#endif
         //inet_pton(AF_INET, argv[2], &sin2.sin_addr);
         if (bind(sockfd, (struct sockaddr*)&sin2, sizeof(sin2)) < 0) {
             perror("bind");
