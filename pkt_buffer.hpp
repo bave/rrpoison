@@ -71,7 +71,7 @@ pkt_buffer::init()
 bool
 pkt_buffer::set_buffer(char* buf, int buf_size)
 {
-    if (buf_size >= 1500) {
+    if (buf_size > BUFSIZ) {
         return false;
     } else {
         init();

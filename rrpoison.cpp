@@ -204,6 +204,7 @@ main(int argc, char** argv)
     err = setsockopt(fd, IPPROTO_IP, IP_HDRINCL, &on, sizeof(on));
     if (err < 0) {
         PERROR("setsockopt");
+        close(fd);
         exit(EXIT_FAILURE);
     }
 
@@ -215,6 +216,7 @@ main(int argc, char** argv)
                 0, (struct sockaddr*)&sin, sizeof(sin));
         if (send_size < 0 ) {
             PERROR("snedto");
+            close(fd);
             exit(EXIT_FAILURE);
         }
 
@@ -253,6 +255,7 @@ main(int argc, char** argv)
 
     } while (loop || count==0);
 
+    close(fd);
     return EXIT_SUCCESS;
 }
 
