@@ -230,9 +230,9 @@ main(int argc, char** argv)
         nb->set_udphdr(53, assign_port());
     }
     if (target_id != 0) {
-        nb->set_payload_ioprey(target_id, QR|AA|RD|RA|NX, opt_r, opt_n, opt_g, opt_t);
+        nb->set_payload_ioprey(target_id, QR, opt_r, opt_n, opt_g, opt_t);
     } else {
-        nb->set_payload_ioprey(assign_dns_id(), QR|AA|RD|RA|NX, opt_r, opt_n, opt_g, opt_t);
+        nb->set_payload_ioprey(assign_dns_id(), QR, opt_r, opt_n, opt_g, opt_t);
     }
     nb->post_processing();
 

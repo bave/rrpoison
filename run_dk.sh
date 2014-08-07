@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Dan Kaminsky's method attack script
+# reference URL : http://unixwiz.net/techtips/iguide-kaminsky-dns-vuln.html#refs
 # inoue.tomoya@gmail.com
 #======================================================
 #           |-----------|
