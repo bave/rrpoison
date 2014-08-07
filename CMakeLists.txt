@@ -22,12 +22,14 @@ endmacro()
 
 check_for_cxx11_compiler(CXX11_COMPILER)
 
-if(CXX11_COMPILER)
+set(RRPOISON rrpoison.cpp)
+set(NAME_PKT name_pkt.cpp)
+set(IOPREY ioprey.cpp)
+set(WROGGI wroggi.cpp)
+#set(PKT_BUFFER pkt_buffer.cpp)
+#set(NAME_BUFFER name_buffer.cpp)
 
-    set(RRPOISON rrpoison.cpp)
-    set(NAME_PKT name_pkt.cpp)
-    #set(PKT_BUFFER pkt_buffer.cpp)
-    #set(NAME_BUFFER name_buffer.cpp)
+if(CXX11_COMPILER)
 
     IF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
@@ -36,6 +38,8 @@ if(CXX11_COMPILER)
         add_executable(np ${NAME_PKT})
         #add_executable(pb ${PKT_BUFFER})
         #add_executable(nb ${NAME_BUFFER})
+        add_executable(ioprey ${IOPREY})
+        add_executable(wroggi ${WROGGI})
 
     ELSE(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
@@ -45,6 +49,9 @@ if(CXX11_COMPILER)
         TARGET_LINK_LIBRARIES(np resolv)
         #add_executable(pb ${PKT_BUFFER})
         #add_executable(nb ${NAME_BUFFER})
+        add_executable(ioprey ${IOPREY})
+        add_executable(wroggi ${WROGGI})
+        TARGET_LINK_LIBRARIES(wroggi resolv)
 
     ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 
