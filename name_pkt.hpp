@@ -403,6 +403,8 @@ bool name_pkt::n_create_rr_answer(std::string &s)
     return true;
 };
 
+#include "utils.hpp"
+
 bool name_pkt::n_create_rr_nameserverNS(std::string &name, std::string &glue)
 {
     n_name++;
@@ -410,7 +412,7 @@ bool name_pkt::n_create_rr_nameserverNS(std::string &name, std::string &glue)
     n_name_type = 2;   //NS
     n_name_class = 1;  //IN
     n_name_ttl = 3600; // 1 hour
-    n_name_rlen = n_compress(glue.data(), (size_t)name.size(), n_name_rdata, sizeof(n_name_rdata));
+    n_name_rlen = n_compress(glue.data(), (size_t)glue.size(), n_name_rdata, sizeof(n_name_rdata));
     return true;
 };
 
@@ -534,7 +536,7 @@ void name_pkt::n_build_tcp_payload(void)
 #endif
         } else {
             memcpy(count_pointer, n_name_rdata, (int)n_name_rlen);
-            for (size_t i=0; i<n_name_rlen; i++) count_pointer++;
+            for (size_t i=0; i<=n_name_rlen; i++) count_pointer++;
         }
     }
 

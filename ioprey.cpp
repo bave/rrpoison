@@ -192,16 +192,19 @@ main(int argc, char** argv)
 
     if (opt_n.size() == 0) {
         usage(argv[0]);
+        printf("error: opt_n\n");
         exit(EXIT_FAILURE);
     }
 
     if (opt_g.size() == 0) {
         usage(argv[0]);
+        printf("error: opt_g\n");
         exit(EXIT_FAILURE);
     }
 
     if (opt_r.size() == 0) {
         usage(argv[0]);
+        printf("error: opt_r\n");
         exit(EXIT_FAILURE);
     }
 
