@@ -29,6 +29,9 @@ Example: sudo ifconfig lo0 alias x.x.x.x/32
 
 ```
 
+### run_dk.sh
+ - Dan Kaminsky's method attack script
+
 ### Depend
  - MacOSX  o
  - FreeBSD o
