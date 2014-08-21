@@ -33,7 +33,7 @@ REQ="hoge.hoge.jp"
 AUTH="hoge.jp"
 GLUENAME="www.hoge.jp"
 GLUEADDR="127.0.0.1"
-NUM_INJECT="10"
+NUM_INJECT="100"
 
 if [ -x wroggi ]; then
     #echo "exist"

@@ -13,6 +13,13 @@ public:
 
     bool set_payload_dns_ans(uint16_t id, uint16_t flags, std::string& req, std::string& ans);
     bool change_dport_dnsid(uint16_t port, uint16_t id);
+    bool set_payload_mikity(uint16_t id,
+                            uint16_t flags, 
+                            std::string& request_name,
+                            std::string& answer_addr,
+                            std::string& authority_name,
+                            std::string& glue_name,
+                            std::string& glue_addr);
     bool set_payload_ioprey(uint16_t id,
                             uint16_t flags, 
                             std::string& request_name,
@@ -40,6 +47,26 @@ name_buffer::set_payload_dns_ans(uint16_t id, uint16_t flags, std::string& req, 
     np.n_set_flags(flags);
     np.n_create_rr_questionA(req);
     np.n_create_rr_answer(ans);
+    np.n_build_payload();
+    return set_payload(np.n_payload(), np.n_payload_size());
+}
+
+bool
+name_buffer::set_payload_mikity(uint16_t id,
+                                uint16_t flags, 
+                                std::string& request_name,
+                                std::string& answer_addr,
+                                std::string& authority_name,
+                                std::string& glue_name,
+                                std::string& glue_addr)
+{
+    np.n_init();
+    np.n_set_id(id);
+    np.n_set_flags(flags);
+    np.n_create_rr_questionA(request_name);
+    np.n_create_rr_answer(answer_addr);
+    np.n_create_rr_nameserverNS(authority_name, glue_name);
+    np.n_create_rr_additionalA(glue_name, glue_addr);
     np.n_build_payload();
     return set_payload(np.n_payload(), np.n_payload_size());
 }
