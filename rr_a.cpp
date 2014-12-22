@@ -149,7 +149,7 @@ main(int argc, char** argv)
     pb->set_payload(np->n_payload(), np->n_payload_size());
     pb->post_processing();
 
-    struct sockaddr_in sin = pb->get_src_sockaddr();
+    struct sockaddr_in sin = pb->get_dst_sockaddr();
 
     fd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
     if (fd < 0) {

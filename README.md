@@ -38,6 +38,9 @@ Example: sudo ifconfig lo0 alias x.x.x.x/32
  - Linux   o
  - etc     ?
 
+### ToDo
+ - muller dns re-delegation attack
+
 ## Contributing
 1. Fork it
 2. Create your feature branch (`git checkout -b new-branch-name`)

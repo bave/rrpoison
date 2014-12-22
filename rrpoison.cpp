@@ -195,7 +195,7 @@ main(int argc, char** argv)
     }
     nb->post_processing();
 
-    struct sockaddr_in sin = nb->get_src_sockaddr();
+    struct sockaddr_in sin = nb->get_dst_sockaddr();
 
     fd = socket(AF_INET, SOCK_RAW, IPPROTO_RAW);
     if (fd < 0) {
