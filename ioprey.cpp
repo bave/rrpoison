@@ -321,7 +321,8 @@ void usage(char* prog_name)
     printf("\n");
     printf("If you want to spoof the source address,\n");
     printf("you set a same option (-s) alias address to the sending IF.\n");
-    printf("(Example: ifconfig lo0 alias x.x.x.x/32)\n");
+    printf("(Example bsd  : ifconfig lo0 alias x.x.x.x/xx)\n");
+    printf("(Example linux: ifconfig lo0:1 x.x.x.x/xx)\n");
     return;
 }
 

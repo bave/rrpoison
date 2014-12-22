@@ -25,7 +25,11 @@ OPTION
 
 If you want to spoof the source address,
 you set a same option (-s) alias address to the sending network IF.
-Example: sudo ifconfig lo0 alias x.x.x.x/32
+Example:
+ - bsd
+sudo ifconfig lo0 alias x.x.x.x/xx
+ - linux
+sudo ifconfig lo0:1 x.x.x.x/xx
 
 ```
 
