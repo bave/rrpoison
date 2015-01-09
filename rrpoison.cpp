@@ -322,7 +322,16 @@ uint16_t assign_port()
 
 uint16_t assign_dns_id()
 {
-    return id_counter;
+    if (port_counter == 0) {
+        if (id_counter == 0xFFFF) {
+            id_counter = 1;
+        } else {
+            id_counter++;
+        }
+        return id_counter;
+    } else {
+        return id_counter;
+    }
     //return rand();
 }
 
