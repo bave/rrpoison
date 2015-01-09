@@ -293,7 +293,7 @@ void usage(char* prog_name)
     printf("  Option..\n");
     printf("    -c [count number]     : 0 is loop                 (default:0)\n");
     printf("    -x [target port]      : 0 is sequential increment (default:0)\n");
-    printf("    -y [target dns_is]    : 0 is random               (default:0)\n");
+    printf("    -y [target dns_is]    : 0 is sequential increment (default:0)\n");
     printf("    -w [wait time of IPG] : unit is nano seconds      (defualt:0)\n");
     printf("    -v : verbose mode (default:disable)\n");
     printf("\n");
@@ -304,20 +304,26 @@ void usage(char* prog_name)
     return;
 }
 
+static int port_counter = 0;
+static int id_counter = 1;
 uint16_t assign_port()
 {
-    static int counter = 0;
-    if (counter == 0xFFFF) {
-        counter = 0;
+    if (port_counter == 0xFFFF) {
+        port_counter = 0;
+        id_counter++;
+        if (id_counter == 0xFF) {
+            id_counter = 1;
+        }
     }
-    counter++;
-    return counter;
+    port_counter++;
+    return port_counter;
     //return rand();
 }
 
 uint16_t assign_dns_id()
 {
-    return rand();
+    return id_counter;
+    //return rand();
 }
 
 void interval(struct timeval i)
