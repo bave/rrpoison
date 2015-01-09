@@ -82,7 +82,7 @@ main(int argc, char** argv)
     };
 
 
-    while ((opt = getopt_long(argc, argv, "a:r:d:s:c:x:y:?hv", long_options, &option_index)) != -1) {
+    while ((opt = getopt_long(argc, argv, "a:r:d:s:c:x:y:w:?hv", long_options, &option_index)) != -1) {
         switch (opt) {
 #ifdef DEBUG
             case 'v':
