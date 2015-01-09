@@ -54,6 +54,9 @@ main(int argc, char** argv)
 
     // opt_*
     debug = false;
+    int wait = 0;
+    struct timespec wait_time;
+    memset(&wait_time, 0, sizeof(struct timespec));
     int count = 0;
     uint16_t target_id = 0;
     uint16_t target_port = 0;
@@ -74,6 +77,7 @@ main(int argc, char** argv)
         {"count",   required_argument, NULL, 'c'},
         {"t_port",  required_argument, NULL, 'x'},
         {"t_id",    required_argument, NULL, 'y'},
+        {"wait",    required_argument, NULL, 'w'},
         {0, 0, 0, 0}
     };
 
@@ -105,7 +109,7 @@ main(int argc, char** argv)
                 try {
                     target_port = std::stoi(optarg);
                 } catch (const std::exception& e) {
-                    std::cout << "(-x)" << e.what() << std::endl;
+                    std::cout << "(-x) " << e.what() << std::endl;
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -113,7 +117,7 @@ main(int argc, char** argv)
                 try {
                     target_id = std::stoi(optarg);
                 } catch (const std::exception& e) {
-                    std::cout << "(-y)" << e.what() << std::endl;
+                    std::cout << "(-y) " << e.what() << std::endl;
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -122,7 +126,20 @@ main(int argc, char** argv)
                     count = std::stoi(optarg);
                 } catch (const std::exception& e) {
                     usage(argv[0]);
-                    std::cout << "(-c)" << e.what() << std::endl;
+                    std::cout << "(-c) " << e.what() << std::endl;
+                    exit(EXIT_FAILURE);
+                }
+                break;
+            case 'w':
+                try {
+                    wait = std::stoi(optarg);
+                    if (wait != 0) {
+                        wait_time.tv_sec  = wait / 1000000000;
+                        wait_time.tv_nsec = wait % 1000000000;
+                    }
+                } catch (const std::exception& e) {
+                    usage(argv[0]);
+                    std::cout << "(-w) " << e.what() << std::endl;
                     exit(EXIT_FAILURE);
                 }
                 break;
@@ -255,6 +272,10 @@ main(int argc, char** argv)
         }
         loop_count++;
 
+        if (wait != 0) {
+            nanosleep(&wait_time, NULL);
+        }
+
     } while (loop || count==0);
 
     close(fd);
@@ -270,9 +291,10 @@ void usage(char* prog_name)
     printf("    -a [ans address] \n");
     printf("    -r [req name]\n");
     printf("  Option..\n");
-    printf("    -c [count number]  : 0 is loop   (default:0)\n");
-    printf("    -x [target port]   : 0 is random (default:0)\n");
-    printf("    -y [target dns_is] : 0 is random (default:0)\n");
+    printf("    -c [count number]     : 0 is loop                 (default:0)\n");
+    printf("    -x [target port]      : 0 is sequential increment (default:0)\n");
+    printf("    -y [target dns_is]    : 0 is random               (default:0)\n");
+    printf("    -w [wait time of IPG] : unit is nano seconds      (defualt:0)\n");
     printf("    -v : verbose mode (default:disable)\n");
     printf("\n");
     printf("If you want to spoof the source address,\n");
@@ -284,7 +306,13 @@ void usage(char* prog_name)
 
 uint16_t assign_port()
 {
-    return rand();
+    static int counter = 0;
+    if (counter == 0xFFFF) {
+        counter = 0;
+    }
+    counter++;
+    return counter;
+    //return rand();
 }
 
 uint16_t assign_dns_id()
